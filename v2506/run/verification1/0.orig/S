@@ -14,9 +14,11 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
+#include "../settings"
+
 dimensions      [];
 
-internalField   uniform 1;
+internalField   uniform $C_S;
 
 boundaryField
 {

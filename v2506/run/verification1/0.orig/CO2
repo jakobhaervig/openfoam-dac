@@ -26,12 +26,13 @@ boundaryField
         value           $internalField;
         name            massTransferCO2;
         
+        #include "../settings"
         code
         #{
-            const scalar K_ext = 1.3e-3; // External mass transfer coefficient [m/s]
-            const scalar D_CO2_l = 2e-10; // Diffusion coefficient of CO2 in liquid phase [m²/s]
-            const scalar C_CO2_g = 1.63578e-05; // Saturation concentration of CO2 in liquid phase
-            const scalar H_cc = 3.25; // Henry's law constant for CO2 [mol/(m³·Pa)]
+            const scalar K_ext = $K_ext; // External mass transfer coefficient [m/s]
+            const scalar D_CO2_l = $D_CO2_l; // Diffusion coefficient of CO2 in liquid phase [m²/s]
+            const scalar C_CO2_g = $C_CO2_g; // Saturation concentration of CO2 in liquid phase
+            const scalar H_cc = $H_cc; // Henry's law constant for CO2 [mol/(m³·Pa)]
 
             const volScalarField& CO2 = this->db().lookupObject<volScalarField>("CO2");
 

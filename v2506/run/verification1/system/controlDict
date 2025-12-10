@@ -14,6 +14,8 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
+#include "../settings"
+
 application         simpleFoam;
 startFrom           latestTime;
 startTime           0;
@@ -80,7 +82,8 @@ functions
         field           D_CO2;
         fieldType       volTensorField;
         writeControl    writeTime;
-        expression      "tensor(2e-10, 0, 0, 0, 0, 0, 0, 0, 0)";
+        #include        "../settings"
+        expression      "tensor($D_CO2_l, 0, 0, 0, 0, 0, 0, 0, 0)";
         dimensions      [0 2 -1 0 0 0 0];
     }
 
@@ -91,7 +94,8 @@ functions
         field           D_S;
         fieldType       volTensorField;
         writeControl    writeTime;
-        expression      "tensor(4.8e-11, 0, 0, 0, 0, 0, 0, 0, 0)";
+        #include        "../settings"
+        expression      "tensor($D_S, 0, 0, 0, 0, 0, 0, 0, 0)";
         dimensions      [0 2 -1 0 0 0 0];
     }
 
@@ -101,7 +105,8 @@ functions
         libs            (fieldFunctionObjects);
         field           kf;
         writeControl    writeTime;
-        expression      "96";
+        #include        "../settings"
+        expression      "$kf";
         dimensions      [0 0 -1 0 0 0 0];
     }
 
