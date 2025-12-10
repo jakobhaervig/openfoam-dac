@@ -1,0 +1,127 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  v2412                                 |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      blockMeshDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+//mergeType points;   // Wedge geometry - Merge points instead of topology
+scale       1;
+
+//- Half angle of wedge in degrees
+halfAngle   1;
+
+//- Radius of feed [m]
+radius      250e-6;
+
+// Length of the feed
+l           3; 
+
+x           #eval "$radius * cos(degToRad($halfAngle))";
+z           #eval "$radius * sin(degToRad($halfAngle))";
+z_neg       #eval "-1 * $z";
+// x           #calc "$radius * cos(degToRad($halfAngle))";
+// z           #calc "$radius * sin(degToRad($halfAngle))";
+// z_neg       #calc "-1 * $z";
+
+vertices
+(
+    (0  0 0)            //0
+    ($x 0 $z_neg)       //1
+    ($x $l $z_neg)      //2
+    (0 $l 0)            //3
+    ($x 0 $z)           //4
+    ($x $l $z)          //5
+);
+
+blocks
+(
+    // hex (0 1 2 3 0 4 5 3) (200 500 1) simpleGrading
+    // (
+    //     (
+    //         (0.8 0.3 0.1)
+    //         (0.2 0.7 0.3)
+    //     )
+    //     1
+    //     1
+    // )
+    hex (0 1 2 3 0 4 5 3) (250 250 1) simpleGrading (1 1 1)
+);
+
+edges
+(
+    arc 1 4 ($radius 0 0)
+    arc 2 5 ($radius $l 0)
+);
+
+boundary
+(
+    origo
+    {
+        type empty;
+        faces
+        (
+            (0 3 3 0)
+        );
+    }
+
+    farfield
+    {
+        type wall;
+        faces
+        (
+            (1 2 5 4)
+        );
+    }
+
+    lower_inner
+    {
+        type patch;
+        faces
+        (
+            (0 1 4 0)
+        );
+    }
+    upper_inner
+    {
+        type patch;
+        faces
+        (
+            (2 3 3 5)
+        );
+    }
+
+    wedge_lower
+    {
+        type wedge;
+        faces
+        (  
+            (0 3 2 1)
+        );
+    }
+
+    wedge_upper
+    {
+        type wedge;
+        faces
+        (
+            (0 4 5 3)
+        );
+    }
+);
+
+mergePatchPairs
+(
+);
+
+
+// ************************************************************************* //
