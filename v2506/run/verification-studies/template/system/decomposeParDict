@@ -14,9 +14,7 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-#include "../settings"
-
-numberOfSubdomains  $n_procs;
+numberOfSubdomains  {n_procs};
 
 method              scotch;
 

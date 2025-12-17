@@ -56,9 +56,11 @@ def read_parameter_from_settings(parameter, settings_file):
 if __name__ == "__main__":
     cwd = Path(__file__).parent
     
-    #start_end = [0,6]
-    myrange = [7]
-    #start_end = [12,14]
+    #myrange = [0,1,2,3,4,5,6]
+    #myrange = [7,8,9,10,11]
+    #myrange = [12,13]
+    #myrange = [14,15,16,17]
+    myrange = [18,19,20,21,23,23]
 
     numbers = [f"case_{i:04d}" for i in myrange]
 
@@ -71,7 +73,8 @@ if __name__ == "__main__":
     print(f"Found {len(case_dirs)} case directories")
     
     fig, ax = plt.subplots()
-    ref_value = 30000  # Reference value
+    ref_value = 500  # Reference value
+    paramter = 'Bi'
     
     # Store line data for annotation
     line_data = []
@@ -85,18 +88,21 @@ if __name__ == "__main__":
         try:
             # Read epsilon from settings file
             settings_file = case_dir / 'settings'
-            parameter_value = read_parameter_from_settings('Da', settings_file)
+            parameter_value = read_parameter_from_settings(paramter, settings_file)
             
             # Calculate the fraction
             reference_fraction = parameter_value / ref_value
             
-            # Create label with epsilon notation
+            # Create label with parameter
             if abs(reference_fraction - 1.0) < 0.01:
-                label = r'$\varepsilon$'
+                #label = r'$\theta$'
+                label = rf'{paramter}'
             elif abs(reference_fraction - int(reference_fraction)) < 0.01:
-                label = f'${int(reference_fraction)}\\varepsilon$'
+                #label = rf'{int(reference_fraction)}$\theta$'
+                label = rf'{int(reference_fraction)}{paramter}'
             else:
-                label = f'${reference_fraction:.2g}\\varepsilon$'
+                #label = rf'{reference_fraction:.2g}$\theta$'
+                label = rf'{reference_fraction:.2g}{paramter}'
             
             time_folder = get_second_highest_numbered_folder(case_dir)
             if time_folder is None:
@@ -151,7 +157,7 @@ if __name__ == "__main__":
     
     # Distribute label positions evenly from 0.05 to 0.9 along x-axis
     if valid_case_count > 0:
-        label_positions = np.linspace(0.02, 0.6, valid_case_count)
+        label_positions = np.linspace(0.2, 0.6, valid_case_count)
     
     # Add annotations distributed along each line
     for i, data in enumerate(line_data):
@@ -169,7 +175,7 @@ if __name__ == "__main__":
     
     # Load and plot reference data from CSV
     try:
-        ref_data = pd.read_csv(cwd / 'fig2.csv', header=1)
+        ref_data = pd.read_csv(cwd / 'fig4.csv', header=1)
         
         # Get the line colors to match scatter plots with lines
         line_colors = [d['color'] for d in line_data]
@@ -213,5 +219,5 @@ if __name__ == "__main__":
     ax.set_ylabel(r'Non-dimensional radial-averaged concentration, $\phi_\text{S}$', fontsize=12)
     ax.grid()
     plt.tight_layout()
-    plt.savefig("fig2.svg")
+    plt.savefig("fig4.svg")
     plt.show()
