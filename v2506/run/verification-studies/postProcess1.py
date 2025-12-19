@@ -19,7 +19,7 @@ def get_second_highest_numbered_folder(path='.'):
     if len(numeric_folders) < 2:
         return None
     numeric_folders.sort(key=lambda x: x[0], reverse=True)
-    return numeric_folders[1][1]
+    return numeric_folders[0][1]
 
 def read_openfoam_scalar_field(filename):
     with open(filename, 'r') as f:
@@ -139,7 +139,7 @@ if __name__ == "__main__":
                 continue
             # Plot S concentration for this case
             x_data = read_parameter_from_settings('D_CO2_l', settings_file)*means[:, 0]/(read_parameter_from_settings('Uavg', settings_file)*read_parameter_from_settings('R', settings_file)**2)
-            y_data = means[:, 2]/max_S
+            y_data = means[:, 2]
             line, = ax.plot(x_data, y_data, linewidth=2)
             
             # Store data for later annotation
