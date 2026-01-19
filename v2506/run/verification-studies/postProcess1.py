@@ -219,5 +219,5 @@ if __name__ == "__main__":
     ax.set_ylabel(r'Non-dimensional radial-averaged concentration, $\phi_\text{S}$', fontsize=12)
     ax.grid()
     plt.tight_layout()
-    plt.savefig("fig4.svg")
+    plt.savefig("fig.svg")
     plt.show()
