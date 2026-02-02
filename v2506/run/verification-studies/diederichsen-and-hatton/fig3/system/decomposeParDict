@@ -10,13 +10,12 @@ FoamFile
     version     2.0;
     format      ascii;
     class       dictionary;
-    object      mapFieldsDict;
+    object      decomposeParDict;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-patchMap        ( );
+numberOfSubdomains  4;
 
-cuttingPatches  ( );
-
+method              scotch;
 
 // ************************************************************************* //

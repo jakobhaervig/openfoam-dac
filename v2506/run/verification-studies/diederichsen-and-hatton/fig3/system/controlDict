@@ -59,7 +59,7 @@ functions
         field           D_CO2;
         fieldType       volTensorField;
         writeControl    writeTime;
-        expression      "tensor({D_CO2_l}, 0, 0, 0, 0, 0, 0, 0, 0)";
+        expression      "tensor(2e-10, 0, 0, 0, 0, 0, 0, 0, 0)";
         dimensions      [0 2 -1 0 0 0 0];
     }
 
@@ -70,7 +70,7 @@ functions
         field           D_S;
         fieldType       volTensorField;
         writeControl    writeTime;
-        expression      "tensor({D_S}, 0, 0, 0, 0, 0, 0, 0, 0)";
+        expression      "tensor(4.8e-11, 0, 0, 0, 0, 0, 0, 0, 0)";
         dimensions      [0 2 -1 0 0 0 0];
     }
 
@@ -80,7 +80,7 @@ functions
         libs            (fieldFunctionObjects);
         field           k_rxn;
         writeControl    writeTime;
-        expression      "{k_rxn}";
+        expression      "96.0";
         dimensions      [0 0 -1 0 0 0 0];
     }
         // expression      "pow(10, 11.365-(2211/T)) * pow(10, 0.5*(0.28*S+0.301*S_inlet)+0.134*(S_inlet-S))";
@@ -91,7 +91,7 @@ functions
         libs            (fieldFunctionObjects);
         field           H_cc;
         writeControl    writeTime;
-        expression      "{H_cc}";
+        expression      "3.25";
         dimensions      [0 0 0 0 0 0 0];
     }
 
