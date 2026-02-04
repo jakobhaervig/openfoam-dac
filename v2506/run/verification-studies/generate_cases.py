@@ -64,14 +64,14 @@ for i in range(nCases):
 
         with open(pathSettingsFile, 'a') as file:
             for key, value in parameter.items():
-                file.write(f"{key} {value};\n")
+                file.write(f"{key} {value:.6e};\n")
 
                 #find and replace all occurrences of {key} in all files in pathCase
                 for path in pathCase.rglob('*'):
                     if path.is_file():
                         with open(path, 'r') as f:
                             filedata = f.read()
-                        filedata = filedata.replace(f"{{{key}}}", str(value))
+                        filedata = filedata.replace(f"{{{key}}}", f"{value:.6e}")
                         with open(path, 'w') as f:
                             f.write(filedata)
 
