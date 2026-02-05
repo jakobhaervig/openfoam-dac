@@ -1,0 +1,49 @@
+data_CO2
+{
+    type    sets;
+    libs    (sampling);
+
+    writeControl  writeTime;
+    writeInterval 1;
+
+    setFormat           csv;
+    interpolationScheme cellPatchConstrained;
+
+    fields ( C_CO2);
+
+    sets
+    {
+        line_1
+        {
+            type    midPoint;
+            axis    z;
+            start   (0 0 -1e-6);
+            end     (0 0 {L});
+        }
+    }
+}
+
+data_S
+{
+    type    sets;
+    libs    (sampling);
+
+    writeControl  writeTime;
+    writeInterval 1;
+
+    setFormat           csv;
+    interpolationScheme cellPatchConstrained;
+
+    fields ( C_S);
+
+    sets
+    {
+        line_1
+        {
+            type    midPoint;
+            axis    z;
+            start   (0 0 -1e-6);
+            end     (0 0 {L});
+        }
+    }
+}

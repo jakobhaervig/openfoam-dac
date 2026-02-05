@@ -16,7 +16,7 @@ FoamFile
 
 dimensions      [];
 
-internalField   uniform 0;
+internalField   uniform 0.0;
 
 boundaryField
 {
@@ -24,14 +24,14 @@ boundaryField
     {
         type       externalSpecieDiffusionResistance;
         H_cc       {H_cc};
-        D_CO2_l    {D_CO2_l};
+        D_CO2      {D_CO2};
         C_CO2_g    {C_CO2_g};
         K_ext      {K_ext};
     }
     inlet
     {
         type            fixedValue;
-        value           uniform 0;
+        value           uniform {C_CO20};
     }
     outlet
     {

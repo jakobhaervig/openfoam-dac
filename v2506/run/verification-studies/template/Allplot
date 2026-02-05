@@ -1,0 +1,36 @@
+##!/bin/sh
+cd ${0%/*} || exit 1    # Run from this directory
+
+gnuplot<<'EOF'
+    # Read all parameters from overview file
+    system("awk '{print $1 \" = \" $2}' overview > .params.tmp")
+    load '.params.tmp'
+    system("rm -f .params.tmp")
+    
+    # Print all loaded parameters
+    system("awk '{printf \"%s = %s\\n\", $1, $2}' overview")
+
+    # Get latest timesteps from postProcessing directories
+    latestTime_CO2 = system("ls -v postProcessing/data_CO2/ | tail -1")
+    latestTime_S = system("ls -v postProcessing/data_S/ | tail -1")
+    print "Latest CO2 time: ", latestTime_CO2
+    print "Latest S time: ", latestTime_S
+
+    set datafile separator ","
+    set datafile columnheaders
+
+    set terminal pngcairo size 800,600 enhanced font 'Verdana,10'
+    set output 'CO2.png'
+    set xlabel "Non-dimensional axial position, {/Symbol z}"
+    set ylabel "Non-dimensional radial-averaged concentration, {/Symbol f}_{CO2}"
+    plot sprintf("postProcessing/data_CO2/%s/line_1_C_CO2.csv", latestTime_CO2) skip 1 u ((D_CO2*$1)/(Uavg*R*R)):($2/(C_CO2_g*H_cc)) notitle
+
+    set terminal pngcairo size 800,600 enhanced font 'Verdana,10'
+    set output 'S.png'
+    set xlabel "Non-dimensional axial position, {/Symbol z}"
+    set ylabel "Non-dimensional radial-averaged concentration, {/Symbol f}_{S}"
+    plot sprintf("postProcessing/data_S/%s/line_1_C_S.csv", latestTime_S) skip 1 u ((D_CO2*$1)/(Uavg*R*R)):($2/C_S0) notitle
+
+EOF
+
+#------------------------------------------------------------------------------

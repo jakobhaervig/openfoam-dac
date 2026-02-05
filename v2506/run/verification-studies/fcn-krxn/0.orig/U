@@ -29,7 +29,7 @@ boundaryField
 
         code
         #{
-            const scalar Uavg = 2e-5;  // Max velocity
+            const scalar Uavg = 2.0e-5;  // Mean velocity
             const vectorField& faceCentres = patch().Cf(); 
             static bool firstTime = true;
             static scalar R = -GREAT;

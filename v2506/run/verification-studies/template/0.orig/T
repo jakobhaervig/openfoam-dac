@@ -14,7 +14,7 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-dimensions      [0 0 0 1 0 0 0]; // [temperature]
+dimensions      [0 0 0 1 0 0 0];
 
 internalField   uniform 298;
 

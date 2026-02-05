@@ -35,10 +35,9 @@ libs
     "libexternalSpecieDiffusionResistance.so"
 );
 
-
 functions
 {
-    #include "FO_columnAverage"
+    #include "FO_cholumnAverage"
     #include "FO_writeCellVolumes"
     #include "FO_writeCellCentres"
     #include "FO_createScalarFields"

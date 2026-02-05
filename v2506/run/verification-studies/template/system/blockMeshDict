@@ -15,7 +15,7 @@ FoamFile
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 R {R};
-z {z};
+L {L};
 n_R {n_R};
 n_z {n_z};
 
@@ -31,20 +31,20 @@ vertices
     (0  0 0)        //0
     ($x $y_neg 0)   //1
     ($x $y_pos 0)   //2
-    (0  0 $z)       //3
-    ($x $y_neg $z)  //4
-    ($x $y_pos $z)  //5
+    (0  0 $L)       //3
+    ($x $y_neg $L)  //4
+    ($x $y_pos $L)  //5
 );
 
 blocks
 (
-    hex (0 1 2 0 3 4 5 3) ($n_R 1 $n_z) simpleGrading (0.02 1 10)
+    hex (0 1 2 0 3 4 5 3) ($n_R 1 $n_z) simpleGrading (0.02 1 5)
 );
 
 edges
 (
     arc 1 2 ($R 0 0)
-    arc 4 5 ($R 0 $z)
+    arc 4 5 ($R 0 $L)
 );
 
 boundary

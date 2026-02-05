@@ -27,6 +27,7 @@ gnuplot<<'EOF'
     print "C_S_0 = ", C_S_0
 
     set datafile separator ","
+    set datafile columnheaders
 
     set terminal pngcairo size 800,600 enhanced font 'Verdana,10'
     set output 'CO2_concentration.png'

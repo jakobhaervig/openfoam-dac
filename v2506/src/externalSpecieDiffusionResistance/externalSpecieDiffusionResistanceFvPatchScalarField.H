@@ -74,7 +74,7 @@ class externalSpecieDiffusionResistanceFvPatchScalarField
         scalar H_cc;
         
         //- CO2 diffusion coefficient in liquid [m^2/s]
-        scalar D_CO2_l;
+        scalar D_CO2;
         
         //- CO2 concentration in gas phase [mol/m^3]
         scalar C_CO2_g;
