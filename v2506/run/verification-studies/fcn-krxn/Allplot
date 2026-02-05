@@ -2,6 +2,9 @@
 cd ${0%/*} || exit 1    # Run from this directory
 
 gnuplot<<'EOF'
+
+    print "Extracting parameters from OpenFOAM files..."
+
     D_CO2 = system("grep -A 6 'D_CO2' system/FO_createScalarFields | grep expression | cut -d'(' -f2 | cut -d',' -f1")
     print "D_CO2 = ", D_CO2
 
@@ -20,6 +23,9 @@ gnuplot<<'EOF'
     H_cc = system("grep 'H_cc' 0/C_CO2 | tr -s ' ' | cut -d' ' -f3 | cut -d';' -f1")
     print "H_cc = ", H_cc
 
+    C_S_0 = system("grep 'internalField ' 0/C_S | tr -s ' ' | cut -d' ' -f3 | cut -d';' -f1")
+    print "C_S_0 = ", C_S_0
+
     set datafile separator ","
 
     set terminal pngcairo size 800,600 enhanced font 'Verdana,10'
@@ -32,7 +38,9 @@ gnuplot<<'EOF'
     set output 'S_concentration.png'
     set xlabel "{/Symbol z}"
     set ylabel "Normalised S concentration"
-    plot "postProcessing/internal_S/100/line_1_C_S.csv" skip 1 u ((D_CO2*$1)/(Uavg*R*R)):($2/2.0) notitle
+    plot "postProcessing/internal_S/100/line_1_C_S.csv" skip 1 u ((D_CO2*$1)/(Uavg*R*R)):($2/C_S_0) notitle
+
+    print "Done Plotting"
 
 EOF
 
