@@ -27,13 +27,7 @@ layerAverage
         params[key] = value;
     }
     settingsFile.close();
-    
-    scalar D_CO2 = params["D_CO2"];
-    scalar Uavg = params["Uavg"];
-    scalar R = params["R"];
-    scalar C_S0 = params["C_S0"];
-    scalar C_CO2_g = params["C_CO2_g"];
-    scalar H_cc = params["H_cc"];
+
     label nLayers = label(params["n_z"]);
     
     // Lookup fields
@@ -55,28 +49,41 @@ layerAverage
     reduce(minZ, minOp<scalar>());
     reduce(maxZ, maxOp<scalar>());
     
-    // Calculate layer height
-    scalar cellHeight = (maxZ - minZ) / scalar(nLayers);
+    // Create list of all cell z-coordinates and volumes for sorting
+    labelList cellOrder(C.size());
+    forAll(cellOrder, i) cellOrder[i] = i;
+    
+    // Sort cells by z-coordinate
+    Foam::sort(cellOrder, [&](label a, label b) 
+    {
+        return C[a].component(2) < C[b].component(2);
+    });
+    
+    // Calculate cells per layer (approximately)
+    label totalCells = returnReduce(C.size(), sumOp<label>());
+    label cellsPerLayer = max(1, totalCells / nLayers);
     
     // Initialize arrays for each layer
     scalarField layerS_sum(nLayers, 0.0);
     scalarField layerCO2_sum(nLayers, 0.0);
     scalarField layerVolume(nLayers, 0.0);
-    scalarField layerZ(nLayers, 0.0);
+    scalarField layerZ_sum(nLayers, 0.0);
     
-    // Accumulate values for each layer
-    forAll(C, cellI)
+    // Accumulate values for each layer based on sorted cell distribution
+    label globalCellCount = 0;
+    forAll(cellOrder, i)
     {
+        label cellI = cellOrder[i];
         scalar z = C[cellI].component(2);
-        label layerIdx = round((z - minZ) / cellHeight);
         
-        // Clamp to valid range
-        layerIdx = max(0, min(layerIdx, nLayers - 1));
+        // Determine layer based on cumulative cell count
+        label layerIdx = min(globalCellCount / cellsPerLayer, nLayers - 1);
+        globalCellCount++;
         
         layerS_sum[layerIdx] += S[cellI] * V[cellI];
         layerCO2_sum[layerIdx] += CO2[cellI] * V[cellI];
         layerVolume[layerIdx] += V[cellI];
-        layerZ[layerIdx] = z;
+        layerZ_sum[layerIdx] += z * V[cellI];
     }
     
     // Sum across all processors
@@ -85,31 +92,27 @@ layerAverage
         reduce(layerS_sum, sumOp<scalarField>());
         reduce(layerCO2_sum, sumOp<scalarField>());
         reduce(layerVolume, sumOp<scalarField>());
-        reduce(layerZ, maxOp<scalarField>());
+        reduce(layerZ_sum, sumOp<scalarField>());
     }
     
     // Write data to file in time directory
     if (Pstream::master())
     {
-        fileName outputFile = mesh().time().timePath()/"layerAveragedData";
+        fileName outputFile = "layerAveragedData";
         std::ofstream out(outputFile);
         out.precision(12);
-        out << "# zeta S CO2" << std::endl;
+        out << "# z S CO2" << std::endl;
         
         forAll(layerS_sum, layerIdx)
         {
             if (layerVolume[layerIdx] > VSMALL)
             {
-                scalar z = layerZ[layerIdx];
+                // Volume-weighted average z position for this layer
+                scalar z = layerZ_sum[layerIdx] / layerVolume[layerIdx];
                 scalar S_avg = layerS_sum[layerIdx] / layerVolume[layerIdx];
                 scalar CO2_avg = layerCO2_sum[layerIdx] / layerVolume[layerIdx];
-                scalar zeta = D_CO2 * z / (Uavg * R * R + VSMALL);
                 
-                // Normalize by initial concentrations
-                scalar S_normalized = S_avg / (C_S0 + VSMALL);
-                scalar CO2_normalized = CO2_avg / (C_CO2_g*H_cc + VSMALL);
-                
-                out << zeta << " " << S_normalized << " " << CO2_normalized << std::endl;
+                out << z << " " << S_avg << " " << CO2_avg << std::endl;
             }
         }
         out.close();
