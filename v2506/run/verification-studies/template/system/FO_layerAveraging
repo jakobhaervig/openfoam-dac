@@ -1,0 +1,121 @@
+layerAverage
+{
+    libs ("libutilityFunctionObjects.so");
+    type coded;
+    name layerAverage;
+    enabled yes;
+    writeControl writeTime;
+
+    codeInclude
+    #{
+        #include "fvCFD.H"
+        #include <fstream>
+        #include <map>
+    #};
+
+    codeWrite
+    #{
+
+    // Read parameters from settings file
+    std::ifstream settingsFile("overview");
+    std::map<word, scalar> params;
+    
+    word key;
+    scalar value;
+    while (settingsFile >> key >> value)
+    {
+        params[key] = value;
+    }
+    settingsFile.close();
+    
+    scalar D_CO2 = params["D_CO2"];
+    scalar Uavg = params["Uavg"];
+    scalar R = params["R"];
+    scalar C_S0 = params["C_S0"];
+    scalar C_CO2_g = params["C_CO2_g"];
+    scalar H_cc = params["H_cc"];
+    label nLayers = label(params["n_z"]);
+    
+    // Lookup fields
+    const volScalarField& S = mesh().lookupObject<volScalarField>("C_S");
+    const volScalarField& CO2 = mesh().lookupObject<volScalarField>("C_CO2");
+    const volVectorField& C = mesh().C();
+    const scalarField& V = mesh().V();
+    
+    // Get minimum and maximum z coordinates
+    scalar minZ = GREAT;
+    scalar maxZ = -GREAT;
+    forAll(C, cellI)
+    {
+        scalar z = C[cellI].component(2);
+        minZ = min(minZ, z);
+        maxZ = max(maxZ, z);
+    }
+    
+    reduce(minZ, minOp<scalar>());
+    reduce(maxZ, maxOp<scalar>());
+    
+    // Calculate layer height
+    scalar cellHeight = (maxZ - minZ) / scalar(nLayers);
+    
+    // Initialize arrays for each layer
+    scalarField layerS_sum(nLayers, 0.0);
+    scalarField layerCO2_sum(nLayers, 0.0);
+    scalarField layerVolume(nLayers, 0.0);
+    scalarField layerZ(nLayers, 0.0);
+    
+    // Accumulate values for each layer
+    forAll(C, cellI)
+    {
+        scalar z = C[cellI].component(2);
+        label layerIdx = round((z - minZ) / cellHeight);
+        
+        // Clamp to valid range
+        layerIdx = max(0, min(layerIdx, nLayers - 1));
+        
+        layerS_sum[layerIdx] += S[cellI] * V[cellI];
+        layerCO2_sum[layerIdx] += CO2[cellI] * V[cellI];
+        layerVolume[layerIdx] += V[cellI];
+        layerZ[layerIdx] = z;
+    }
+    
+    // Sum across all processors
+    if (Pstream::parRun())
+    {
+        reduce(layerS_sum, sumOp<scalarField>());
+        reduce(layerCO2_sum, sumOp<scalarField>());
+        reduce(layerVolume, sumOp<scalarField>());
+        reduce(layerZ, maxOp<scalarField>());
+    }
+    
+    // Write data to file in time directory
+    if (Pstream::master())
+    {
+        fileName outputFile = mesh().time().timePath()/"layerAveragedData";
+        std::ofstream out(outputFile);
+        out.precision(12);
+        out << "# zeta S CO2" << std::endl;
+        
+        forAll(layerS_sum, layerIdx)
+        {
+            if (layerVolume[layerIdx] > VSMALL)
+            {
+                scalar z = layerZ[layerIdx];
+                scalar S_avg = layerS_sum[layerIdx] / layerVolume[layerIdx];
+                scalar CO2_avg = layerCO2_sum[layerIdx] / layerVolume[layerIdx];
+                scalar zeta = D_CO2 * z / (Uavg * R * R + VSMALL);
+                
+                // Normalize by initial concentrations
+                scalar S_normalized = S_avg / (C_S0 + VSMALL);
+                scalar CO2_normalized = CO2_avg / (C_CO2_g*H_cc + VSMALL);
+                
+                out << zeta << " " << S_normalized << " " << CO2_normalized << std::endl;
+            }
+        }
+        out.close();
+        
+        Info << "Layer-averaged data written to " << outputFile << endl;
+    }
+    
+    #};
+}
