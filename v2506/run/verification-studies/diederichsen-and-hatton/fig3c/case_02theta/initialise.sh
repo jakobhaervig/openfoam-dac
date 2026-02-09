@@ -4,7 +4,7 @@
 
 set -e  # Exit on error
 
-template="../../../template"
+template="../../template"
 overview="overview"
 case_dir="."
 

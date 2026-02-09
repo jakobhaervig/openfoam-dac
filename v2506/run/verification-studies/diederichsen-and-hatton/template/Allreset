@@ -1,0 +1,16 @@
+#!/bin/sh
+cd ${0%/*} || exit 1    # Run from this directory
+
+# Prevent execution in template directory
+if [ "$(basename "$PWD")" = "template" ]; then
+    echo "Allreset cannot be run in the template directory"
+    exit 0
+fi
+
+find . -mindepth 1 \
+  ! -name "overview" \
+  ! -name "initialise.sh" \
+  ! -name "ref*.csv" \
+  -exec rm -rf {} +
+
+#------------------------------------------------------------------------------
