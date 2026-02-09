@@ -31,7 +31,7 @@ Parameter['K_ext'] = Bi * Parameter['H_cc'] * Parameter['D_CO2'] / (Parameter['R
 theta = 0.24
 Parameter['D_S'] = theta * Parameter['D_CO2']  # m^2/s (Diffusion coefficient of salt in liquid phase)
 
-Da = 30000
+Da = 50*30000
 Parameter['k_rxn'] = Da * Parameter['D_CO2'] / (Parameter['C_S0'] * Parameter['R']**2)
 
 print('Parameters:', Parameter)
