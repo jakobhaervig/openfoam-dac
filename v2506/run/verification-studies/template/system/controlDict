@@ -37,12 +37,8 @@ libs
 
 functions
 {
-    #include "FO_columnAverage"
-    #include "FO_writeCellVolumes"
-    #include "FO_writeCellCentres"
     #include "FO_createScalarFields"
     #include "FO_scalarTransport"
-    #include "FO_sampling"
     #include "FO_layerAveraging"
 }
 
